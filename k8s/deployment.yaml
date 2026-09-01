@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wisecow
@@ -16,9 +16,7 @@ spec:
     spec:
       containers:
         - name: wisecow
-          # Replace <DOCKERHUB_USERNAME> with your actual Docker Hub username / GHCR path.
-          # This must match the image pushed by the GitHub Actions workflow.
-          image: <DOCKERHUB_USERNAME>/wisecow:latest
+          image: rakshith0103/wisecow:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 4499

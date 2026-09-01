@@ -4,6 +4,7 @@ FROM ubuntu:22.04
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         fortune-mod \
+        fortunes-min \
         cowsay \
         netcat-openbsd \
         ca-certificates && \
@@ -18,7 +19,7 @@ COPY wisecow.sh .
 RUN chmod +x wisecow.sh
 
 # Run as a non-root user for security
-RUN useradd -m wisecow
+RUN useradd -m wisecow && chown -R wisecow:wisecow /app
 USER wisecow
 
 EXPOSE 4499
