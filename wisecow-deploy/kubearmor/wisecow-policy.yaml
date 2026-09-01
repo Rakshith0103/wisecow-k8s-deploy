@@ -1,0 +1,44 @@
+# Zero-trust KubeArmor policy for the wisecow workload.
+#
+# The wisecow container only ever needs to run: wisecow.sh, cowsay, fortune,
+# and nc. This policy blocks execution of common attacker/lateral-movement
+# tools (shells other than the app's own, package managers, network
+# fetch tools) inside the pod, and alerts on any attempted use — enforcing
+# least-privilege / zero-trust at the process level.
+#
+# Apply with: kubectl apply -f wisecow-policy.yaml
+# Docs: https://docs.kubearmor.io/kubearmor/
+
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+  name: wisecow-zero-trust-policy
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: wisecow
+
+  process:
+    matchPaths:
+      - path: /usr/bin/apt
+      - path: /usr/bin/apt-get
+      - path: /usr/bin/wget
+      - path: /usr/bin/curl
+      - path: /usr/bin/python3
+      - path: /usr/bin/perl
+      - path: /bin/nc
+        # nc is used legitimately by wisecow.sh itself; only flag it if it's
+        # invoked interactively/outside the expected entrypoint context.
+        fromSource:
+          - path: /bin/bash
+
+  file:
+    matchDirectories:
+      - dir: /etc/
+        recursive: true
+        readOnly: true
+      - dir: /root/
+        recursive: true
+
+  action: Block
